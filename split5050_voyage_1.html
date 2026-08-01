@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F5C400">
+<title>Split 50/50 — Accra · Cotonou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EC; --ink:#17150F; --taxi:#F5C400; --taxi-deep:#D9A800;
+    --clay:#B4432E; --leaf:#1E7A4F; --line:#17150F22; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{background:var(--paper); color:var(--ink);
+    font-family:'Archivo', system-ui, -apple-system, sans-serif; font-size:16px;}
+  .wrap{max-width:480px; margin:0 auto; padding:0 16px 120px;}
+
+  /* ---------- Ticket de solde (signature) ---------- */
+  header{padding:20px 0 8px;}
+  .route{font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; opacity:.65;}
+  h1{font-weight:900; font-size:26px; letter-spacing:-.01em; line-height:1.05; margin:2px 0 14px;}
+  .ticket{position:relative; background:var(--taxi); border:2px solid var(--ink);
+    border-radius:14px; padding:18px 18px 16px; box-shadow:4px 4px 0 var(--ink);}
+  .ticket::before,.ticket::after{content:""; position:absolute; top:50%; width:22px; height:22px;
+    background:var(--paper); border:2px solid var(--ink); border-radius:50%; transform:translateY(-50%);}
+  .ticket::before{left:-13px;} .ticket::after{right:-13px;}
+  .ticket .lbl{font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;}
+  .ticket .who{font-size:17px; font-weight:600; margin-top:6px;}
+  .ticket .amt{font-size:42px; font-weight:900; letter-spacing:-.02em; line-height:1; margin-top:4px;
+    font-variant-numeric:tabular-nums;}
+  .ticket .even{font-size:24px; font-weight:900;}
+  .ticket .sub{font-size:12px; margin-top:8px; opacity:.75;}
+
+  /* ---------- Totaux ---------- */
+  .totline{display:flex; gap:10px; margin:14px 0 4px;}
+  .tot{flex:1; background:var(--card); border:1.5px solid var(--ink); border-radius:10px; padding:10px 12px;}
+  .tot .k{font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; opacity:.6;}
+  .tot .v{font-size:16px; font-weight:900; margin-top:2px; font-variant-numeric:tabular-nums;}
+
+  /* ---------- Formulaire ---------- */
+  section h2{font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+    margin:22px 0 10px; opacity:.65;}
+  .payers{display:flex; gap:8px;}
+  .payers button{flex:1; padding:12px; font-family:inherit; font-weight:900; font-size:15px;
+    border:2px solid var(--ink); border-radius:10px; background:var(--card); color:var(--ink); cursor:pointer;}
+  .payers button.on{background:var(--ink); color:var(--taxi);}
+  .amount{display:flex; align-items:center; gap:8px; margin-top:10px; background:var(--card);
+    border:2px solid var(--ink); border-radius:10px; padding:4px 14px;}
+  .amount input{flex:1; border:0; outline:0; font-family:inherit; font-weight:900; font-size:28px;
+    padding:8px 0; background:transparent; min-width:0; font-variant-numeric:tabular-nums;}
+  .amount .cur{font-weight:900; font-size:16px; opacity:.55;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  .chips button{padding:8px 12px; font-family:inherit; font-size:13px; font-weight:600;
+    border:1.5px solid var(--ink); border-radius:999px; background:var(--card); cursor:pointer;}
+  .chips button.on{background:var(--taxi); box-shadow:2px 2px 0 var(--ink);}
+  .modes{display:flex; gap:8px; margin-top:10px;}
+  .modes button{flex:1; padding:9px 6px; font-family:inherit; font-size:12px; font-weight:600;
+    border:1.5px solid var(--ink); border-radius:8px; background:var(--card); cursor:pointer;}
+  .modes button.on{background:var(--ink); color:#fff;}
+  input.note{width:100%; margin-top:10px; padding:11px 14px; font-family:inherit; font-size:14px;
+    border:1.5px solid var(--ink); border-radius:10px; background:var(--card); outline:none;}
+  .add{width:100%; margin-top:12px; padding:15px; font-family:inherit; font-weight:900; font-size:16px;
+    letter-spacing:.04em; border:2px solid var(--ink); border-radius:12px; background:var(--taxi);
+    box-shadow:3px 3px 0 var(--ink); cursor:pointer;}
+  .add:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink);}
+
+  /* ---------- Liste ---------- */
+  .day{font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+    margin:18px 0 8px; opacity:.55;}
+  .exp{display:flex; align-items:center; gap:12px; background:var(--card); border:1.5px solid var(--ink);
+    border-radius:12px; padding:12px 14px; margin-bottom:8px;}
+  .exp .cat{width:38px; height:38px; border-radius:9px; background:var(--paper); border:1.5px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:17px; flex:none;}
+  .exp .mid{flex:1; min-width:0;}
+  .exp .t{font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .exp .s{font-size:12px; opacity:.6; margin-top:1px;}
+  .exp .amt2{font-weight:900; font-size:15px; text-align:right; font-variant-numeric:tabular-nums;}
+  .exp .amt2 small{display:block; font-size:10px; font-weight:600; opacity:.55;}
+  .exp.reglement{background:#EAF5EE; border-style:dashed;}
+  .exp .del{border:0; background:transparent; font-size:16px; cursor:pointer; opacity:.4; padding:4px;}
+  .empty{text-align:center; padding:36px 20px; border:2px dashed var(--line); border-radius:14px;
+    font-size:14px; opacity:.65; margin-top:8px;}
+
+  /* ---------- Barre d'actions ---------- */
+  .bar{position:fixed; bottom:0; left:0; right:0; background:var(--paper);
+    border-top:2px solid var(--ink); padding:10px 16px calc(10px + env(safe-area-inset-bottom));}
+  .bar .in{max-width:480px; margin:0 auto; display:flex; gap:8px;}
+  .bar button{flex:1; padding:12px 6px; font-family:inherit; font-weight:600; font-size:13px;
+    border:1.5px solid var(--ink); border-radius:10px; background:var(--card); cursor:pointer;}
+  .bar .settle{background:var(--leaf); color:#fff; font-weight:900;}
+  .names{font-size:12px; opacity:.6; margin-top:10px;}
+  .names button{border:0; background:none; font-family:inherit; text-decoration:underline; cursor:pointer; font-size:12px;}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="route">Abidjan → Accra → Cotonou · 03–10 août 2026</div>
+    <h1>Split 50/50</h1>
+    <div class="ticket" id="ticket"></div>
+    <div class="totline">
+      <div class="tot"><div class="k" id="kA">Payé par Guy</div><div class="v" id="vA">0 F</div></div>
+      <div class="tot"><div class="k" id="kB">Payé par elle</div><div class="v" id="vB">0 F</div></div>
+      <div class="tot"><div class="k">Total voyage</div><div class="v" id="vT">0 F</div></div>
+    </div>
+    <div class="names">Voyageurs : <b id="nA2">Guy</b> &amp; <b id="nB2">Awa</b>
+      <button onclick="renameB()">modifier le prénom</button></div>
+  </header>
+
+  <section>
+    <h2>Nouvelle dépense</h2>
+    <div class="payers">
+      <button id="pA" class="on" onclick="setPayer('A')">Payé par <span id="nA3">Guy</span></button>
+      <button id="pB" onclick="setPayer('B')">Payé par <span id="nB3">Awa</span></button>
+    </div>
+    <div class="amount"><input id="amt" type="number" inputmode="numeric" placeholder="0"><span class="cur">FCFA</span></div>
+    <div class="chips" id="chips"></div>
+    <div class="modes">
+      <button id="m50" class="on" onclick="setMode('50')">Partagé 50/50</button>
+      <button id="m100" onclick="setMode('100')">100% pour l'autre</button>
+      <button id="m0" onclick="setMode('0')">Perso (0%)</button>
+    </div>
+    <input class="note" id="note" type="text" placeholder="Note (ex : car Adjamé, Airbnb Osu, Bloom Bar…)">
+    <button class="add" onclick="addExp()">Ajouter la dépense</button>
+  </section>
+
+  <section>
+    <h2>Historique</h2>
+    <div id="list"></div>
+  </section>
+</div>
+
+<div class="bar"><div class="in">
+  <button class="settle" onclick="settle()">On se règle</button>
+  <button onclick="exportCSV()">Export CSV</button>
+  <button onclick="resetAll()">Vider</button>
+</div></div>
+
+<script>
+const CATS=[["🚌","Transport"],["🏠","Logement"],["🍛","Restos"],["🍾","Sorties"],["🎯","Activités"],["🛍️","Divers"]];
+const KEY="split5050_accra_cotonou";
+let state={nameA:"Guy",nameB:"Awa",payer:"A",cat:0,mode:"50",items:[]};
+
+function load(){try{const s=localStorage.getItem(KEY); if(s) state=Object.assign(state,JSON.parse(s));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+const F=n=>Math.round(n).toLocaleString("fr-FR")+" F";
+
+function buildChips(){
+  const c=document.getElementById("chips"); c.innerHTML="";
+  CATS.forEach((cat,i)=>{
+    const b=document.createElement("button");
+    b.textContent=cat[0]+" "+cat[1];
+    b.className=(i===state.cat)?"on":"";
+    b.onclick=()=>{state.cat=i; buildChips();};
+    c.appendChild(b);
+  });
+}
+function setPayer(p){state.payer=p;
+  document.getElementById("pA").className=p==="A"?"on":"";
+  document.getElementById("pB").className=p==="B"?"on":"";}
+function setMode(m){state.mode=m;
+  ["m50","m100","m0"].forEach(id=>document.getElementById(id).className="");
+  document.getElementById(m==="50"?"m50":m==="100"?"m100":"m0").className="on";}
+
+function share(it){ // part due par l'AUTRE au payeur
+  if(it.type==="reglement") return 0;
+  return it.mode==="50"? it.amt/2 : it.mode==="100"? it.amt : 0;
+}
+function balance(){ // >0 : B doit à A
+  let b=0;
+  state.items.forEach(it=>{
+    if(it.type==="reglement"){ b += (it.payer==="A"? it.amt : -it.amt); }
+    else{ b += (it.payer==="A"? share(it) : -share(it)); }
+  });
+  return b;
+}
+function render(){
+  document.getElementById("nA2").textContent=state.nameA;
+  document.getElementById("nB2").textContent=state.nameB;
+  document.getElementById("nA3").textContent=state.nameA;
+  document.getElementById("nB3").textContent=state.nameB;
+  document.getElementById("kA").textContent="Payé par "+state.nameA;
+  document.getElementById("kB").textContent="Payé par "+state.nameB;
+  const spent=p=>state.items.filter(i=>i.type!=="reglement"&&i.payer===p).reduce((s,i)=>s+i.amt,0);
+  document.getElementById("vA").textContent=F(spent("A"));
+  document.getElementById("vB").textContent=F(spent("B"));
+  document.getElementById("vT").textContent=F(spent("A")+spent("B"));
+  const b=balance(); const t=document.getElementById("ticket");
+  if(Math.abs(b)<1){
+    t.innerHTML='<div class="lbl">Solde du voyage</div><div class="amt even">✓ Vous êtes quittes</div><div class="sub">Aucune dette entre vous deux pour l\'instant.</div>';
+  }else{
+    const deb=b>0?state.nameB:state.nameA, cred=b>0?state.nameA:state.nameB;
+    t.innerHTML='<div class="lbl">Solde du voyage</div><div class="who">'+deb+' doit à '+cred+'</div>'+
+      '<div class="amt">'+F(Math.abs(b))+'</div>'+
+      '<div class="sub">Basé sur '+state.items.filter(i=>i.type!=="reglement").length+' dépense(s) enregistrée(s).</div>';
+  }
+  const L=document.getElementById("list"); L.innerHTML="";
+  if(!state.items.length){L.innerHTML='<div class="empty">Aucune dépense pour l\'instant.<br>Premier réflexe lundi : le ticket de car — 21 000 F.</div>'; return;}
+  let lastDay="";
+  [...state.items].reverse().forEach(it=>{
+    const d=new Date(it.ts);
+    const day=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+    if(day!==lastDay){lastDay=day; const h=document.createElement("div"); h.className="day"; h.textContent=day; L.appendChild(h);}
+    const e=document.createElement("div");
+    e.className="exp"+(it.type==="reglement"?" reglement":"");
+    const payer=it.payer==="A"?state.nameA:state.nameB;
+    const modeTxt=it.type==="reglement"?"remboursement":(it.mode==="50"?"50/50":it.mode==="100"?"100% pour l'autre":"perso");
+    e.innerHTML='<div class="cat">'+(it.type==="reglement"?"🤝":CATS[it.cat][0])+'</div>'+
+      '<div class="mid"><div class="t">'+(it.note||(it.type==="reglement"?"Règlement":CATS[it.cat][1]))+'</div>'+
+      '<div class="s">'+payer+' · '+modeTxt+'</div></div>'+
+      '<div class="amt2">'+F(it.amt)+(it.type!=="reglement"&&share(it)>0?'<small>dont '+F(share(it))+' dû</small>':'')+'</div>'+
+      '<button class="del" aria-label="Supprimer">✕</button>';
+    e.querySelector(".del").onclick=()=>{if(confirm("Supprimer cette ligne ?")){state.items=state.items.filter(x=>x.id!==it.id); save(); render();}};
+    L.appendChild(e);
+  });
+}
+function addExp(){
+  const a=parseInt(document.getElementById("amt").value,10);
+  if(!a||a<=0){alert("Saisis un montant en FCFA."); return;}
+  state.items.push({id:Date.now(),ts:Date.now(),payer:state.payer,amt:a,cat:state.cat,
+    mode:state.mode,note:document.getElementById("note").value.trim(),type:"exp"});
+  document.getElementById("amt").value=""; document.getElementById("note").value="";
+  save(); render(); window.scrollTo({top:0,behavior:"smooth"});
+}
+function settle(){
+  const b=balance();
+  if(Math.abs(b)<1){alert("Vous êtes déjà quittes ✓"); return;}
+  const deb=b>0?state.nameB:state.nameA, cred=b>0?state.nameA:state.nameB;
+  if(confirm(deb+" rembourse "+F(Math.abs(b))+" à "+cred+" (Wave/MoMo/cash) — enregistrer le règlement ?")){
+    state.items.push({id:Date.now(),ts:Date.now(),payer:b>0?"B":"A",amt:Math.abs(b),cat:5,mode:"100",
+      note:"Règlement "+deb+" → "+cred,type:"reglement"});
+    save(); render();
+  }
+}
+function exportCSV(){
+  let csv="Date;Payeur;Categorie;Mode;Montant FCFA;Part due;Note\n";
+  state.items.forEach(it=>{
+    const d=new Date(it.ts).toLocaleString("fr-FR");
+    csv+=[d,(it.payer==="A"?state.nameA:state.nameB),
+      it.type==="reglement"?"Règlement":CATS[it.cat][1],
+      it.type==="reglement"?"remboursement":it.mode,
+      it.amt,Math.round(share(it)),(it.note||"").replace(/;/g,",")].join(";")+"\n";
+  });
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="split5050_accra_cotonou.csv"; a.click();
+}
+function renameB(){
+  const n=prompt("Prénom de ton amie :",state.nameB);
+  if(n&&n.trim()){state.nameB=n.trim(); save(); render();}
+}
+function resetAll(){
+  if(confirm("Tout effacer ? (fais un Export CSV avant si tu veux garder la trace)")){
+    state.items=[]; save(); render();
+  }
+}
+load(); buildChips(); setPayer(state.payer); setMode(state.mode); render();
+</script>
+</body>
+</html>
